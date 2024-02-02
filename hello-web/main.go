@@ -10,6 +10,10 @@ import (
 	"syscall"
 )
 
+const (
+	oneMb = 1024 * 1024
+)
+
 var shouldFailOnHealthz = false
 
 func hello(w http.ResponseWriter, r *http.Request) {
@@ -29,6 +33,13 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
+func heavy(w http.ResponseWriter, r *http.Request) {
+	log.Printf("request %s from %s\n", r.RequestURI, r.Host)
+	v := make([]int, 10*oneMb)
+	v[0] = 0x00
+	w.Write([]byte("heavy request"))
+}
+
 func init() {
 	_, shouldFailOnHealthz = os.LookupEnv("FLAKY")
 	if shouldFailOnHealthz {
@@ -40,6 +51,7 @@ func main() {
 	server := &http.Server{Addr: ":8080"}
 	http.HandleFunc("/", notfound)
 	http.HandleFunc("/hello", hello)
+	http.HandleFunc("/heavy", hello)
 	http.HandleFunc("/healthz", healthz)
 	http.HandleFunc("/flaky", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("i just got flaky :-/"))
