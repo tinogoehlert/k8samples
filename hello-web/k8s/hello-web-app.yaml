@@ -28,3 +28,17 @@ spec:
             limits:
               memory: "100Mi"
               cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-web
+
+spec:
+  ports:
+    - name: web
+      port: 80
+      targetPort: web
+
+  selector:
+    app: hello-web
