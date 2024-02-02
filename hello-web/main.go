@@ -51,7 +51,7 @@ func main() {
 	server := &http.Server{Addr: ":8080"}
 	http.HandleFunc("/", notfound)
 	http.HandleFunc("/hello", hello)
-	http.HandleFunc("/heavy", hello)
+	http.HandleFunc("/heavy", heavy)
 	http.HandleFunc("/healthz", healthz)
 	http.HandleFunc("/flaky", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("i just got flaky :-/"))
