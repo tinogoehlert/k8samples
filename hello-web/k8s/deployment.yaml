@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: hello-web
-          image: hello-web
+          image: ghcr.io/tinogoehlert/k8samples/hello-web:main
           ports:
             - name: web
               containerPort: 8080
