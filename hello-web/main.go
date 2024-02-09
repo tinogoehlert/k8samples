@@ -8,17 +8,28 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const (
 	oneMb = 1024 * 1024
 )
 
+var helloCounter = prometheus.NewCounter(
+	prometheus.CounterOpts{
+		Name: "hello_request_count",
+		Help: "No of request handled by Hello handler",
+	},
+)
+
 var shouldFailOnHealthz = false
 
 func hello(w http.ResponseWriter, r *http.Request) {
+	helloCounter.Inc()
 	log.Printf("request %s from %s\n", r.RequestURI, r.Host)
-	w.Write([]byte("ola world"))
+	w.Write([]byte("hello world"))
 }
 
 func notfound(w http.ResponseWriter, r *http.Request) {
@@ -48,11 +59,14 @@ func init() {
 }
 
 func main() {
+	prometheus.MustRegister(helloCounter)
+
 	server := &http.Server{Addr: ":8080"}
 	http.HandleFunc("/", notfound)
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/heavy", heavy)
 	http.HandleFunc("/healthz", healthz)
+	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/flaky", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("i just got flaky :-/"))
 		shouldFailOnHealthz = true

@@ -1,22 +1,22 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: hello-web
+  name: flake-01
   labels:
-    app: hello-web
+    app: flake-01
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-web
+      app: flake-01
   template:
     metadata:
       labels:
-        app: hello-web
+        app: flake-01
     spec:
       containers:
-        - name: hello-web
+        - name: flake-01
           image: ghcr.io/tinogoehlert/k8samples/hello-web:main
           ports:
             - name: web
@@ -28,23 +28,9 @@ spec:
             limits:
               memory: "100Mi"
               cpu: "300m"
-          readinessProbe:
+          livenessProbe:
             httpGet:
-              path: /healthz
+              path: /healthzasfdsfaw
               port: 8080
             initialDelaySeconds: 1
             periodSeconds: 3
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hello-web
-
-spec:
-  ports:
-    - name: web
-      port: 80
-      targetPort: web
-
-  selector:
-    app: hello-web
